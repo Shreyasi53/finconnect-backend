@@ -45,4 +45,50 @@ const registerUser = async (req, res) => {
   }
 };
 
-export { registerUser };
+const loginUser = async (req, res) => {
+
+    try {
+
+        const { email, username, password } = req.body;
+
+        if (!(email || username)) {
+            return res.status(400).json({
+                message: "Email or username is required"
+            });
+        }
+
+        const user = await User.findOne({
+            $or: [{ email }, { username }]
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User does not exist"
+            });
+        }
+
+        const isPasswordValid = await user.isPasswordCorrect(password);
+
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                message: "Invalid user credentials"
+            });
+        }
+
+        const accessToken = user.generateAccessToken();
+
+        return res.status(200).json({
+            message: "User logged in successfully",
+            accessToken
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            message: "Something went wrong",
+            error: error.message
+        });
+    }
+};
+
+export { registerUser, loginUser };
