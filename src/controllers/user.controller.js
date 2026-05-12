@@ -91,4 +91,10 @@ const loginUser = async (req, res) => {
     }
 };
 
-export { registerUser, loginUser };
+const getCurrentUser = async (req, res)=>{
+    return res.status(200).json({
+        user: req.user
+    });
+}
+
+export { registerUser, loginUser, getCurrentUser };
