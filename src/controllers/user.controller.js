@@ -97,4 +97,11 @@ const getCurrentUser = async (req, res)=>{
     });
 }
 
-export { registerUser, loginUser, getCurrentUser };
+const getAllUsers = async (req, res) =>{
+    const users = await User.find().select("-password");
+    return res.status(200).json({
+        users
+    });
+}
+
+export { registerUser, loginUser, getCurrentUser, getAllUsers };
