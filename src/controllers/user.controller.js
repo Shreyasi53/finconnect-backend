@@ -1,11 +1,14 @@
 import { User } from "../models/user.model.js";
 
+// REGISTER USER
 const registerUser = async (req, res) => {
   try {
+
     const { fullname, username, email, password, role } = req.body;
+
     if (
       [fullname, username, email, password].some(
-        (field) => field?.trim() === "",
+        (field) => field?.trim() === ""
       )
     ) {
       return res.status(400).json({
@@ -23,12 +26,22 @@ const registerUser = async (req, res) => {
       });
     }
 
+    // advisor -> pending
+    // normal user -> approved
+
+    let userStatus = "approved";
+
+    if (role === "advisor") {
+      userStatus = "pending";
+    }
+
     const user = await User.create({
       fullname,
       username,
       email,
       password,
       role,
+      status: userStatus,
     });
 
     const createdUser = await User.findById(user._id).select("-password");
@@ -37,71 +50,118 @@ const registerUser = async (req, res) => {
       message: "User registered successfully",
       user: createdUser,
     });
+
   } catch (error) {
+
     return res.status(500).json({
       message: "Something went wrong",
-      error,
+      error: error.message,
     });
   }
 };
 
+// LOGIN USER
 const loginUser = async (req, res) => {
 
-    try {
+  try {
 
-        const { email, username, password } = req.body;
+    const { email, username, password } = req.body;
 
-        if (!(email || username)) {
-            return res.status(400).json({
-                message: "Email or username is required"
-            });
-        }
-
-        const user = await User.findOne({
-            $or: [{ email }, { username }]
-        });
-
-        if (!user) {
-            return res.status(404).json({
-                message: "User does not exist"
-            });
-        }
-
-        const isPasswordValid = await user.isPasswordCorrect(password);
-
-        if (!isPasswordValid) {
-            return res.status(401).json({
-                message: "Invalid user credentials"
-            });
-        }
-
-        const accessToken = user.generateAccessToken();
-
-        return res.status(200).json({
-            message: "User logged in successfully",
-            accessToken
-        });
-
-    } catch (error) {
-
-        return res.status(500).json({
-            message: "Something went wrong",
-            error: error.message
-        });
+    if (!(email || username)) {
+      return res.status(400).json({
+        message: "Email or username is required",
+      });
     }
+
+    const user = await User.findOne({
+      $or: [{ email }, { username }],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User does not exist",
+      });
+    }
+
+    const isPasswordValid = await user.isPasswordCorrect(password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        message: "Invalid user credentials",
+      });
+    }
+
+    const accessToken = user.generateAccessToken();
+
+    return res.status(200).json({
+      message: "User logged in successfully",
+      accessToken,
+    });
+
+  } catch (error) {
+
+    return res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+    });
+  }
 };
 
-const getCurrentUser = async (req, res)=>{
-    return res.status(200).json({
-        user: req.user
-    });
-}
+// CURRENT LOGGED-IN USER
+const getCurrentUser = async (req, res) => {
 
-const getAllUsers = async (req, res) =>{
-    const users = await User.find().select("-password");
-    return res.status(200).json({
-        users
-    });
-}
+  return res.status(200).json({
+    user: req.user,
+  });
+};
 
-export { registerUser, loginUser, getCurrentUser, getAllUsers };
+// ADMIN -> GET ALL USERS
+const getAllUsers = async (req, res) => {
+
+  const users = await User.find().select("-password");
+
+  return res.status(200).json({
+    users,
+  });
+};
+
+// ADMIN -> GET PENDING ADVISORS
+const getPendingAdvisors = async (req, res) => {
+
+  const advisors = await User.find({
+    role: "advisor",
+    status: "pending",
+  }).select("-password");
+
+  return res.status(200).json({
+    advisors,
+  });
+};
+
+// ADMIN -> APPROVE ADVISOR
+const approveAdvisor = async (req, res) => {
+
+  const advisor = await User.findByIdAndUpdate(
+    req.params.id,
+    {
+      status: "approved",
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+
+  return res.status(200).json({
+    message: "Advisor approved successfully",
+    advisor,
+  });
+};
+
+export {
+  registerUser,
+  loginUser,
+  getCurrentUser,
+  getAllUsers,
+  getPendingAdvisors,
+  approveAdvisor,
+};
