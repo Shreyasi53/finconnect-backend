@@ -5,7 +5,8 @@ import {
     getCurrentUser,
     getAllUsers,
     getPendingAdvisors,
-    approveAdvisor
+    approveAdvisor,
+    updateProfile
  } from "../controllers/user.controller.js";
 
 import verifyJWT from "../middlewares/auth.middleware.js";
@@ -19,5 +20,6 @@ router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/all-users").get(verifyJWT, verifyRole("admin"), getAllUsers);
 router.route("/pending-advisors").get(verifyJWT, verifyRole("admin"), getPendingAdvisors);
 router.route("/approve-advisor/:id").patch(verifyJWT, verifyRole("admin"), approveAdvisor);
+router.route("/update-profile").patch(verifyJWT, updateProfile);
 
 export default router;

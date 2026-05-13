@@ -157,6 +157,50 @@ const approveAdvisor = async (req, res) => {
   });
 };
 
+const updateProfile = async (req, res) =>{
+  try{
+    const{
+      fullname,
+      bio,
+      location,
+      expertise,
+      experience,
+      linkedin,
+      twitter,
+      instagram,
+      profileImage,
+    } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        fullname,
+        bio,
+        location,
+        expertise,
+        experience,
+        linkedin,
+        twitter,
+        instagram,
+        profileImage,
+      },
+      {
+        new: true,
+      }
+    ).select("-password");
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+    });
+  }
+};
+
 export {
   registerUser,
   loginUser,
@@ -164,4 +208,5 @@ export {
   getAllUsers,
   getPendingAdvisors,
   approveAdvisor,
+  updateProfile
 };

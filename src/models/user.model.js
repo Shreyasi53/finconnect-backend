@@ -37,6 +37,38 @@ const userSchema = new mongoose.Schema(
       enum: ["pending", "approved", "rejected"],
       default: "approved",
     },
+    bio:{
+        type: String,
+        default: "",
+    },
+    location:{
+        type: String,
+        default: "",
+    },
+    expertise:{
+        type: String,
+        default: "",
+    },
+    experience:{
+        type: Number,
+        default: 0,
+    },
+    linkedin:{
+        type: String,
+        default: "",
+    },
+    twitter:{
+        type: String,
+        default: "",
+    },
+    instagram:{
+        type: String,
+        default: "",
+    },
+    profileImage:{
+        type: String,
+        default: "",
+    },
   },
   { timestamps: true },
 );
