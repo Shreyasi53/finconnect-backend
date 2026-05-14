@@ -1,112 +1,5 @@
 import { User } from "../models/user.model.js";
 
-// REGISTER USER
-const registerUser = async (req, res) => {
-  try {
-
-    const { fullname, username, email, password, role } = req.body;
-
-    if (
-      [fullname, username, email, password].some(
-        (field) => field?.trim() === ""
-      )
-    ) {
-      return res.status(400).json({
-        message: "All fields are required",
-      });
-    }
-
-    const existedUser = await User.findOne({
-      $or: [{ username }, { email }],
-    });
-
-    if (existedUser) {
-      return res.status(409).json({
-        message: "User already exists",
-      });
-    }
-
-    // advisor -> pending
-    // normal user -> approved
-
-    let userStatus = "approved";
-
-    if (role === "advisor") {
-      userStatus = "pending";
-    }
-
-    const user = await User.create({
-      fullname,
-      username,
-      email,
-      password,
-      role,
-      status: userStatus,
-    });
-
-    const createdUser = await User.findById(user._id).select("-password");
-
-    return res.status(201).json({
-      message: "User registered successfully",
-      user: createdUser,
-    });
-
-  } catch (error) {
-
-    return res.status(500).json({
-      message: "Something went wrong",
-      error: error.message,
-    });
-  }
-};
-
-// LOGIN USER
-const loginUser = async (req, res) => {
-
-  try {
-
-    const { email, username, password } = req.body;
-
-    if (!(email || username)) {
-      return res.status(400).json({
-        message: "Email or username is required",
-      });
-    }
-
-    const user = await User.findOne({
-      $or: [{ email }, { username }],
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User does not exist",
-      });
-    }
-
-    const isPasswordValid = await user.isPasswordCorrect(password);
-
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        message: "Invalid user credentials",
-      });
-    }
-
-    const accessToken = user.generateAccessToken();
-
-    return res.status(200).json({
-      message: "User logged in successfully",
-      accessToken,
-    });
-
-  } catch (error) {
-
-    return res.status(500).json({
-      message: "Something went wrong",
-      error: error.message,
-    });
-  }
-};
-
 // CURRENT LOGGED-IN USER
 const getCurrentUser = async (req, res) => {
 
@@ -115,47 +8,6 @@ const getCurrentUser = async (req, res) => {
   });
 };
 
-// ADMIN -> GET ALL USERS
-const getAllUsers = async (req, res) => {
-
-  const users = await User.find().select("-password");
-
-  return res.status(200).json({
-    users,
-  });
-};
-
-// ADMIN -> GET PENDING ADVISORS
-const getPendingAdvisors = async (req, res) => {
-
-  const advisors = await User.find({
-    role: "advisor",
-    status: "pending",
-  }).select("-password");
-
-  return res.status(200).json({
-    advisors,
-  });
-};
-
-// ADMIN -> APPROVE ADVISOR
-const approveAdvisor = async (req, res) => {
-
-  const advisor = await User.findByIdAndUpdate(
-    req.params.id,
-    {
-      status: "approved",
-    },
-    {
-      new: true,
-    }
-  ).select("-password");
-
-  return res.status(200).json({
-    message: "Advisor approved successfully",
-    advisor,
-  });
-};
 //UPDATE USER PROFILE
 const updateProfile = async (req, res) =>{
   try{
@@ -201,33 +53,52 @@ const updateProfile = async (req, res) =>{
   }
 };
 
-//
-const getAllAdvisors = async (req, res) =>{
-  try{
-    const advisors = await User.find({
-      role: "advisor",
-      status: "approved",
-    }).select("-password");
+// FOLLOW ADVISOR
+const followAdvisor = async (req, res) => {
 
-    return res.status(200).json({
-      advisors,
-    });
+   try {
 
-  } catch (error) {
+      const advisor = await User.findById(req.params.id);
+
+      if (!advisor) {
+         return res.status(404).json({
+            message: "Advisor not found"
+         });
+      }
+
+      if (advisor.role !== "advisor") {
+         return res.status(400).json({
+            message: "You can only follow advisors"
+         });
+      }
+
+      // add follower to advisor
+      advisor.followers.push(req.user._id);
+
+      await advisor.save();
+
+      // add advisor to user's following
+      const user = await User.findById(req.user._id);
+
+      user.following.push(advisor._id);
+
+      await user.save();
+
+      return res.status(200).json({
+         message: "Advisor followed successfully"
+      });
+
+   } catch (error) {
+
       return res.status(500).json({
-      message: "Something went wrong",
-      error: error.message,
-    });
-  }
+         message: "Something went wrong",
+         error: error.message
+      });
+   }
 };
 
 export {
-  registerUser,
-  loginUser,
   getCurrentUser,
-  getAllUsers,
-  getPendingAdvisors,
-  approveAdvisor,
   updateProfile,
-  getAllAdvisors
+  followAdvisor
 };
