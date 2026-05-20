@@ -2,16 +2,15 @@ import { User } from "../models/user.model.js";
 
 // CURRENT LOGGED-IN USER
 const getCurrentUser = async (req, res) => {
-
   return res.status(200).json({
     user: req.user,
   });
 };
 
 //UPDATE USER PROFILE
-const updateProfile = async (req, res) =>{
-  try{
-    const{
+const updateProfile = async (req, res) => {
+  try {
+    const {
       fullname,
       bio,
       location,
@@ -38,12 +37,12 @@ const updateProfile = async (req, res) =>{
       },
       {
         new: true,
-      }
+      },
     ).select("-password");
 
     return res.status(200).json({
       message: "Profile updated successfully",
-      user: updatedUser
+      user: updatedUser,
     });
   } catch (error) {
     return res.status(500).json({
@@ -55,50 +54,78 @@ const updateProfile = async (req, res) =>{
 
 // FOLLOW ADVISOR
 const followAdvisor = async (req, res) => {
+  try {
+    const advisor = await User.findById(req.params.id);
 
-   try {
-
-      const advisor = await User.findById(req.params.id);
-
-      if (!advisor) {
-         return res.status(404).json({
-            message: "Advisor not found"
-         });
-      }
-
-      if (advisor.role !== "advisor") {
-         return res.status(400).json({
-            message: "You can only follow advisors"
-         });
-      }
-
-      // add follower to advisor
-      advisor.followers.push(req.user._id);
-
-      await advisor.save();
-
-      // add advisor to user's following
-      const user = await User.findById(req.user._id);
-
-      user.following.push(advisor._id);
-
-      await user.save();
-
-      return res.status(200).json({
-         message: "Advisor followed successfully"
+    if (!advisor) {
+      return res.status(404).json({
+        message: "Advisor not found",
       });
+    }
 
-   } catch (error) {
-
-      return res.status(500).json({
-         message: "Something went wrong",
-         error: error.message
+    if (advisor.role !== "advisor") {
+      return res.status(400).json({
+        message: "You can only follow advisors",
       });
-   }
+    }
+
+    // add follower to advisor
+    advisor.followers.push(req.user._id);
+
+    await advisor.save();
+
+    // add advisor to user's following
+    const user = await User.findById(req.user._id);
+
+    user.following.push(advisor._id);
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Advisor followed successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+    });
+  }
 };
 
-export {
-  getCurrentUser,
-  updateProfile,
-  followAdvisor
+// APPLY AS ADVISOR
+const applyAdvisor = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // already advisor
+    if (user.role === "advisor") {
+      return res.status(400).json({
+        message: "You are already an advisor",
+      });
+    }
+
+    user.role = "advisor";
+
+    user.status = "pending";
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Advisor application submitted successfully",
+      user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+    });
+  }
 };
+
+export { getCurrentUser, updateProfile, followAdvisor, applyAdvisor };
