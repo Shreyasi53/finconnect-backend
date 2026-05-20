@@ -92,6 +92,40 @@ const followAdvisor = async (req, res) => {
   }
 };
 
+//UNFOLLOW ADVISOR
+const unfollowAdvisor = async (req, res) => {
+  try {
+    const advisor = await User.findById(req.params.id);
+    if (!advisor) {
+      return res.status(404).json({
+        message: "Advisor not found",
+      });
+    }
+    // remove user from advisor followers
+    advisor.followers = advisor.followers.filter(
+      (id) => id.toString() !== req.user._id.toString(),
+    );
+    await advisor.save();
+    // remove advisor from user following
+    const user = await User.findById(req.user._id);
+
+    user.following = user.following.filter(
+      (id) => id.toString() !== advisor._id.toString(),
+    );
+    await user.save();
+
+    return res.status(200).json({
+      message: "Advisor unfollowed successfully",
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+    });
+  }
+};
+
 // APPLY AS ADVISOR
 const applyAdvisor = async (req, res) => {
   try {
@@ -128,4 +162,9 @@ const applyAdvisor = async (req, res) => {
   }
 };
 
-export { getCurrentUser, updateProfile, followAdvisor, applyAdvisor };
+export { 
+  getCurrentUser,
+  updateProfile, 
+  followAdvisor,
+  unfollowAdvisor, 
+  applyAdvisor };
