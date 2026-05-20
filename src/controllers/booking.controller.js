@@ -42,4 +42,46 @@ const createBooking = async (req, res) => {
    }
 };
 
-export { createBooking };
+//GET USER BOOKINGS
+const getUserBookings = async(req, res)=>{
+   try{
+      const bookings = await Booking.find({
+         user: req.user._id
+      })
+      .populate("advisor", "fullname username profileImage")
+      .sort({ createdAt: -1 });
+      return res.status(200).json({
+         bookings
+      });
+   }catch(error){
+      return res.status(500).json({
+         message:"Something went wrong",
+         error: error.message
+      });
+   }
+};
+
+//GET ADVISOR BOOKING
+const getAdvisorBookings = async (req, res) => {
+   try{
+      const bookings = await Booking.find({
+         advisor:req.user._id
+      })
+      .populate("user", "fullname username profileImage")
+      .sort({ createdAt: -1 });
+      return res.status(200).json({
+         bookings
+      });
+   }catch(error){
+      return res.status(500).json({
+         message:"Something went wrong",
+         error: error.message
+      });
+   }
+}
+
+export { 
+   createBooking,
+   getUserBookings,
+   getAdvisorBookings
+};
