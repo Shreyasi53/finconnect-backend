@@ -79,9 +79,67 @@ const getAdvisorBookings = async (req, res) => {
       });
    }
 }
+//ACCEPT BOOKING
+const acceptBooking = async (req, res) =>{
+   try{
+      const booking = await Booking.findById(req.params.id);
+      if(!booking){
+         return res.status(404).json({
+            message: "Booking not found"
+         });
+      }
+      //check ownership
+      if(booking.advisor.toString() !== req.user._id.toString()){
+         return res.status(403).json({
+            message: "Unauthorize action"
+         });
+      }
+      booking.status = "accepted";
+      await booking.save();
+      return res.status(200).json({
+         message: "Booking accepted successfully",
+         booking
+      });
 
+   }catch(error){
+      return res.status(500).json({
+         message:"Something went wrong",
+         error: error.message
+      });
+   }
+}
+//REJECT BOOKING
+const rejectBooking = async (req, res)=>{
+   try{
+      const booking = await Booking.findById(req.params.id);
+      if(!booking){
+         return res.status(404).json({
+            message: "Booking not found"
+         });
+      }
+      //check ownership
+      if(booking.advisor.toString() !== req.user._id.toString()){
+         return res.status(403).json({
+            message: "Unauthorize action"
+         });
+      }
+      booking.status = "rejected";
+      await booking.save();
+      return res.status(200).json({
+         message: "Booking rejected successfully",
+         booking
+      });
+   }catch(error){
+      return res.status(500).json({
+         message: "Something went wrong",
+         error: error.message
+      });
+   }
+};
 export { 
    createBooking,
    getUserBookings,
-   getAdvisorBookings
+   getAdvisorBookings,
+   acceptBooking,
+   rejectBooking
 };
