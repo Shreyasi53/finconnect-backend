@@ -214,6 +214,30 @@ const deleteBlog = async (req, res) => {
    }
 };
 
+//GET MY BLOGS
+const getMyBlogs = async (req, res) => {
+
+   try {
+
+      const blogs = await Blog.find({
+         author: req.user._id
+      }).sort({ createdAt: -1 });
+
+      return res.status(200).json({
+         blogs
+      });
+
+   } catch (error) {
+
+      return res.status(500).json({
+         message: "Something went wrong",
+         error: error.message
+      });
+   }
+};
+
+
+
 export {
    createBlog,
    getAllBlogs,
@@ -221,5 +245,6 @@ export {
    likeBlog,
    commentOnBlog,
    updateBlog,
-   deleteBlog
+   deleteBlog,
+   getMyBlogs
 };
