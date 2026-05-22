@@ -143,10 +143,83 @@ const commentOnBlog = async (req, res) =>{
       });
    }
 };
+
+// UPDATE BLOG
+const updateBlog = async (req, res) => {
+   try {
+      const {
+         title,
+         content,
+         category,
+         image
+      } = req.body;
+      const blog = await Blog.findById(req.params.id);
+      if (!blog) {
+         return res.status(404).json({
+            message: "Blog not found"
+         });
+      }
+      // ONLY BLOG OWNER CAN UPDATE
+      if (
+         blog.author.toString() !==
+         req.user._id.toString()
+      ){
+         return res.status(403).json({
+            message: "Unauthorized action"
+         });
+      }
+      // update fields
+      if (title) blog.title = title;
+      if (content) blog.content = content;
+      if (category) blog.category = category;
+      if (image) blog.image = image;
+      await blog.save();
+      return res.status(200).json({
+         message: "Blog updated successfully",
+         blog
+      });
+   } catch (error) {
+
+      return res.status(500).json({
+         message: "Something went wrong",
+         error: error.message
+      });
+   }
+};
+
+// DELETE BLOG
+const deleteBlog = async (req, res) => {
+   try {
+      const blog = await Blog.findById(req.params.id);
+      if (!blog) {
+         return res.status(404).json({
+            message: "Blog not found"
+         });
+      }
+      // ONLY BLOG OWNER CAN DELETE
+      if (blog.author.toString() !== req.user._id.toString()) {
+         return res.status(403).json({
+            message: "Unauthorized action"
+         });
+      }
+      await blog.deleteOne();
+      return res.status(200).json({
+         message: "Blog deleted successfully"
+      });
+   } catch (error) {
+      return res.status(500).json({
+         message: "Something went wrong",
+         error: error.message
+      });
+   }
+};
+
 export {
    createBlog,
    getAllBlogs,
    getSingleBlog,
    likeBlog,
-   commentOnBlog
+   commentOnBlog,
+   updateBlog,
+   deleteBlog
 };

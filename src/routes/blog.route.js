@@ -8,7 +8,9 @@ import {
    getAllBlogs,
    getSingleBlog,
    likeBlog,
-   commentOnBlog
+   commentOnBlog,
+   updateBlog,
+   deleteBlog
 } from "../controllers/blog.controller.js";
 
 const router = Router();
@@ -18,5 +20,7 @@ router.route("/").get(getAllBlogs);
 router.route("/:id").get(getSingleBlog);
 router.route("/like/:id").patch(verifyJWT, likeBlog);
 router.route("/comment/:id").post(verifyJWT, commentOnBlog);
+router.route("/update/:id").patch(verifyJWT, verifyRole("advisor"), updateBlog);
+router.route("/delete/:id").delete(verifyJWT, verifyRole("advisor"), deleteBlog);
 
 export default router;
