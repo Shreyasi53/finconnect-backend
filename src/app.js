@@ -7,6 +7,7 @@ import adminRoutes from "./routes/admin.routes.js";
 import advisorRoutes from "./routes/advisor.routes.js";
 import blogRoutes from "./routes/blog.route.js";
 import bookingRoutes from "./routes/booking.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/advisors", advisorRoutes);
 app.use("/api/v1/blogs", blogRoutes);
-app.use("/api/v1/bookings", bookingRoutes)
+app.use("/api/v1/bookings", bookingRoutes);
+app.use("/api/v1/notifications", notificationRoutes);
 
 export default app;
