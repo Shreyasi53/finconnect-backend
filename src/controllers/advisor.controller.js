@@ -46,7 +46,44 @@ const getAdvisorProfile = async (req, res) => {
    }
 };
 
+//SEARCH AND FILTER ADVISORS
+const searchAdvisors = async ( req, res ) =>{
+   try{
+      const{
+         search,
+         expertise,
+         location
+      } = req.query;
+      let query = {
+         role: "advisor",
+         status: "approved"
+      };
+      //search by fullname
+      if(search){
+         query.fullname = { $regex: search, $options: "i" };
+      }
+      //search by expertise
+      if(expertise){
+         query.expertise = { $regex: expertise, $options: "i" };
+      }
+      //search by location
+      if(location){
+         query.location = { $regex: location, $options: "i" };
+      }
+      const advisors = await User.find(query).select("-password");
+      return res.status(200).json({
+         advisors
+      });
+   }catch(error){
+      return res.status(500).json({
+         message: "Something went wrong",
+         error: error.message
+      });
+   }
+}
+
 export {
   getAllAdvisors,
-  getAdvisorProfile
-}
+  getAdvisorProfile,
+  searchAdvisors
+};
