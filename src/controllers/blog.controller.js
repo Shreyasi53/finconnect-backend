@@ -136,6 +136,15 @@ const commentOnBlog = async (req, res) => {
       text,
     });
     await blog.save();
+    //create notification for blog author
+    if (blog.author.toString() !== req.user._id.toString()) {
+      await Notification.create({
+        receiver: blog.author,
+        sender: req.user._id,
+        type: "comment",
+        message: `${req.user.fullname} commented on your blog`,
+      });
+    }
     return res.status(200).json({
       message: "Comment added successfully",
       comments: blog.comments,

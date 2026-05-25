@@ -1,5 +1,5 @@
 import { User } from "../models/user.model.js";
-
+import { Notification } from "../models/notification.model.js";
 // CURRENT LOGGED-IN USER
 const getCurrentUser = async (req, res) => {
   return res.status(200).json({
@@ -80,10 +80,16 @@ const followAdvisor = async (req, res) => {
     user.following.push(advisor._id);
 
     await user.save();
-
+    await Notification.create({
+    receiver: advisor._id,
+    sender: req.user._id,
+    type: "follow",
+    message: `${req.user.fullname} started following you`
+    });
     return res.status(200).json({
       message: "Advisor followed successfully",
-    });
+  });
+   
   } catch (error) {
     return res.status(500).json({
       message: "Something went wrong",

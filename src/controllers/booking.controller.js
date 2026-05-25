@@ -1,6 +1,6 @@
 import { Booking } from "../models/booking.model.js";
 import { User } from "../models/user.model.js";
-
+import { Notification } from "../models/notification.model.js";
 // CREATE BOOKING
 const createBooking = async (req, res) => {
    try {
@@ -28,6 +28,13 @@ const createBooking = async (req, res) => {
          time,
          message
       });
+      await Notification.create({
+      receiver: advisor._id,
+      sender: req.user._id,
+      type: "booking",
+      message: `${req.user.fullname} booked a session with you`
+
+});
       return res.status(201).json({
          message: "Booking request sent successfully",
          booking
@@ -96,6 +103,13 @@ const acceptBooking = async (req, res) =>{
       }
       booking.status = "accepted";
       await booking.save();
+      await Notification.create({
+      receiver: booking.user,
+      sender: req.user._id,
+      type: "bookingAccepted",
+      message: `Your booking was accepted`
+
+});
       return res.status(200).json({
          message: "Booking accepted successfully",
          booking
@@ -125,6 +139,13 @@ const rejectBooking = async (req, res)=>{
       }
       booking.status = "rejected";
       await booking.save();
+      await Notification.create({
+      receiver: booking.user,
+      sender: req.user._id,
+      type: "bookingRejected",
+      message: `Your booking was rejected`
+
+});
       return res.status(200).json({
          message: "Booking rejected successfully",
          booking
