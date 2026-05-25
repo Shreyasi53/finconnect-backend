@@ -9,6 +9,7 @@ import {
    getSingleBlog,
    likeBlog,
    commentOnBlog,
+   shareBlog,
    updateBlog,
    deleteBlog,
    getMyBlogs
@@ -22,6 +23,7 @@ router.route("/my-blogs").get(verifyJWT, verifyRole("advisor"), getMyBlogs);
 router.route("/:id").get(getSingleBlog);
 router.route("/like/:id").patch(verifyJWT, likeBlog);
 router.route("/comment/:id").post(verifyJWT, commentOnBlog);
+router.route("/share/:id").patch(verifyJWT, shareBlog);
 router.route("/update/:id").patch(verifyJWT, verifyRole("advisor"), updateBlog);
 router.route("/delete/:id").delete(verifyJWT, verifyRole("advisor"), deleteBlog);
 

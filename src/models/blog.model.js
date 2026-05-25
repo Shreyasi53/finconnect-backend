@@ -52,7 +52,12 @@ const blogSchema = new mongoose.Schema({
             default: Date.now
          }
       }
-   ]
+   ],
+
+   shearCount:{
+      type: Number,
+      default: 0
+   },
 
 }, { timestamps: true });
 

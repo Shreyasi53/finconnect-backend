@@ -157,6 +157,36 @@ const commentOnBlog = async (req, res) => {
   }
 };
 
+// SHARE BLOG
+const shareBlog = async (req, res) => {
+
+   try {
+      const blog = await Blog.findById(
+         req.params.id
+      );
+      if (!blog) {
+         return res.status(404).json({
+            message: "Blog not found"
+         });
+      }
+
+      blog.shareCount = (blog.shareCount || 0) + 1;
+      await blog.save();
+
+      return res.status(200).json({
+         message: "Blog shared successfully",
+         shareCount: blog.shareCount
+      });
+
+   } catch (error) {
+
+      return res.status(500).json({
+         message: "Something went wrong",
+         error: error.message
+      });
+   }
+};
+
 // UPDATE BLOG
 const updateBlog = async (req, res) => {
   try {
@@ -242,6 +272,7 @@ export {
   getSingleBlog,
   likeBlog,
   commentOnBlog,
+  shareBlog,
   updateBlog,
   deleteBlog,
   getMyBlogs,
