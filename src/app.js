@@ -8,6 +8,7 @@ import advisorRoutes from "./routes/advisor.routes.js";
 import blogRoutes from "./routes/blog.route.js";
 import bookingRoutes from "./routes/booking.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
 
 const app = express();
 
@@ -23,5 +24,6 @@ app.use("/api/v1/advisors", advisorRoutes);
 app.use("/api/v1/blogs", blogRoutes);
 app.use("/api/v1/bookings", bookingRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
+app.use("/api/v1/reviews", reviewRoutes);
 
 export default app;
