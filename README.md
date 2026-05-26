@@ -1,14 +1,12 @@
-# FinAdvisor Backend API 🚀
+# FinAdvisor Backend API 
 
 Backend API for a Financial Advisor platform built using Node.js, Express.js, MongoDB, and JWT Authentication.
 
 ## 📄 Swagger API Docs
 https://finconnect-backend-qgc0.onrender.com/api-docs
-
 ---
 
-# ✨ Features
-
+# Features
 - User Authentication & Authorization
 - JWT Based Login System
 - Role Based Access Control (User / Advisor / Admin)
@@ -23,11 +21,9 @@ https://finconnect-backend-qgc0.onrender.com/api-docs
 - MongoDB Atlas Integration
 - Swagger API Documentation
 - Deployment on Render
-
 ---
 
-# 🛠️ Tech Stack
-
+# Tech Stack
 - Node.js
 - Express.js
 - MongoDB Atlas
@@ -36,11 +32,9 @@ https://finconnect-backend-qgc0.onrender.com/api-docs
 - Swagger
 - Render
 - Postman
-
 ---
 
-# 📦 Installation
-
+# Installation
 Clone the repository:
 
 ```bash

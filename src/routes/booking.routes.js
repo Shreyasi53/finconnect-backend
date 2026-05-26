@@ -40,6 +40,23 @@ router.route("/advisor-bookings").get(verifyJWT, getAdvisorBookings);
  *         description: Booking accepted successfully
  */
 router.route("/accept/:id").patch(verifyJWT, acceptBooking);
+/**
+ * @swagger
+ * /api/v1/bookings/reject/{id}:
+ *   patch:
+ *     summary: Reject Booking Request
+ *     tags: [Bookings]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Booking ID
+ *     responses:
+ *       200:
+ *         description: Booking rejected successfully
+ */
 router.route("/reject/:id").patch(verifyJWT, rejectBooking);
 
 export default router;
