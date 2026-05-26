@@ -2,9 +2,6 @@
 
 Backend API for a Financial Advisor platform built using Node.js, Express.js, MongoDB, and JWT Authentication.
 
-## 🌐 Live Demo
-https://finconnect-backend-qgc0.onrender.com
-
 ## 📄 Swagger API Docs
 https://finconnect-backend-qgc0.onrender.com/api-docs
 
