@@ -16,11 +16,37 @@ import {
 } from "../controllers/blog.controller.js";
 
 const router = Router();
-
+/**
+ * @swagger
+ * /api/v1/blogs/create:
+ *   post:
+ *     summary: Create Blog
+ *     tags: [Blogs]
+ *     responses:
+ *       201:
+ *         description: Blog created successfully
+ */
 router.route("/create").post(verifyJWT, verifyRole("advisor"),createBlog);
 router.route("/").get(getAllBlogs);
 router.route("/my-blogs").get(verifyJWT, verifyRole("advisor"), getMyBlogs);
 router.route("/:id").get(getSingleBlog);
+/**
+ * @swagger
+ * /api/v1/blogs/like/{id}:
+ *   patch:
+ *     summary: Like or Unlike a Blog
+ *     tags: [Blogs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Blog ID
+ *     responses:
+ *       200:
+ *         description: Blog liked successfully
+ */
 router.route("/like/:id").patch(verifyJWT, likeBlog);
 router.route("/comment/:id").post(verifyJWT, commentOnBlog);
 router.route("/share/:id").patch(verifyJWT, shareBlog);

@@ -9,11 +9,14 @@ import blogRoutes from "./routes/blog.route.js";
 import bookingRoutes from "./routes/booking.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
